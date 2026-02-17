@@ -89,5 +89,44 @@
     "experimental_code": "def generate_structured_reflective_cot_prompt(problem_statement: str) -> str:\n    \"\"\"\n    Generates a prompt for Structured Reflective Chain-of-Thought (SRCoT).\n    This prompt encourages the model to first think step-by-step,\n    then critically review its own initial reasoning, and finally\n    refine its solution based on the critique.\n    \"\"\"\n    initial_cot_instruction = \"Let's think step by step.\"\n    \n    critique_instruction = (\n        \"Now, critically review your preceding reasoning. \"\n        \"Identify any potential logical flaws, incorrect assumptions, or overlooked details. \"\n        \"Provide a concise critique of your initial thought process.\"\n    )\n    \n    refinement_instruction = (\n        \"Based on your critique, re-evaluate the problem and provide a refined \"\n        \"step-by-step reasoning and a corrected final answer.\"\n    )\n    \n    # The full prompt sent to the LLM would look like this,\n    # expecting the LLM to fill in the bracketed sections.\n    return (\n        f\"Problem: {problem_statement}\\n\\n\"\n        f\"{initial_cot_instruction}\\n\\n\"\n        f\"[Initial CoT Reasoning]\\n\\n\"\n        f\"{critique_instruction}\\n\\n\"\n        f\"[Critique of Initial Reasoning]\\n\\n\"\n        f\"{refinement_instruction}\\n\\n\"\n        f\"[Refined CoT Reasoning and Answer]\"\n    )\n",
     "expected_result": "We expect Structured Reflective Chain-of-Thought (SRCoT) to yield a significant accuracy improvement of 3-7% over standard Chain-of-Thought (CoT) on both GSM8K and Big-Bench Hard reasoning tasks. Specifically, on GSM8K, SRCoT is predicted to achieve an accuracy of 76-80%, surpassing CoT's typical 70-73%. On Big-Bench Hard tasks requiring multi-step logical deduction, SRCoT is expected to show an even greater relative improvement, reaching 45-50% accuracy compared to CoT's 38-42%. This enhanced performance will be particularly evident in problems where subtle errors, logical inconsistencies, or crucial details are often missed by linear reasoning. Higher accuracy values indicate better performance.",
     "expected_conclusion": "This research demonstrates that by introducing a structured, two-phase meta-cognitive self-review loop—comprising explicit critique and subsequent refinement—within a single prompt, large language models can significantly enhance their reasoning capabilities. This prompt-level intervention, \"Structured Reflective Chain-of-Thought,\" unlocks a deeper, more human-like iterative problem-solving process, leading to more robust and accurate solutions without any architectural changes or expensive fine-tuning. This advancement highlights the profound impact of sophisticated prompt engineering in leveraging latent reasoning abilities, pushing the boundaries of AI's capacity for self-correction and complex problem-solving, making AI systems more reliable and trustworthy for critical applications."
+  },
+  "experimental_design": {
+    "experiment_summary": "The experiment aims to evaluate \"Structured Reflective Chain-of-Thought\" (SRCoT), a novel prompt engineering technique, against standard Chain-of-Thought (CoT) for improving reasoning capabilities of large language models. SRCoT introduces a two-phase meta-cognitive self-review (Critique and Refinement) within a single prompt, allowing the model to self-assess and correct its reasoning. The task involves solving challenging arithmetic word problems from the GSM8K dataset. A 4B parameter instruction-tuned model, 'gemma-3-4b-it', will be used in a zero-shot setting for inference on a sufficiently large test set to ensure statistical significance. This setup is designed to fit within the 'ubuntu-latest' runner's resources (4 CPU, 16 GB RAM, 14 GB SSD) by using a moderately sized model and focusing solely on inference without any training or hyperparameter optimization.",
+    "runner_config": {
+      "runner_label": [
+        "ubuntu-latest"
+      ],
+      "description": "GitHub Actions ubuntu-latest runner (4 CPU, 16 GB RAM, 14 GB SSD, x64)"
+    },
+    "evaluation_metrics": [
+      {
+        "name": "Accuracy",
+        "description": "Correctness criteria: A prediction is considered correct if the final numerical answer extracted from the model's output exactly matches the ground truth numerical answer. For math problems, this typically involves parsing the model's output to find the final numerical result.\nCalculation method: (Number of correctly answered problems) / (Total number of problems).\nTask appropriateness: Accuracy is a direct and widely accepted metric for evaluating performance on discrete reasoning tasks like math word problems, where a single correct answer is expected. It directly reflects the model's ability to arrive at the correct solution.\nRelevant visualizations: Bar chart comparing the accuracy of SRCoT and CoT."
+      }
+    ],
+    "models_to_use": [
+      "gemma-3-4b-it"
+    ],
+    "datasets_to_use": [
+      "gsm8k"
+    ],
+    "proposed_method": {
+      "method_name": "Structured Reflective Chain-of-Thought (SRCoT)",
+      "description": "Structured Reflective Chain-of-Thought (SRCoT) is an advanced prompt engineering technique that embeds a two-phase, meta-cognitive self-review process within a single, extended prompt. It first elicits an initial step-by-step reasoning path, followed by a 'Critique' phase where the model analyzes its own generated initial reasoning for inconsistencies or missed constraints. Finally, a 'Refinement' phase prompts the model to incorporate insights from the self-critique to construct a revised, more robust reasoning path and a corrected final answer. This method aims to improve reasoning capabilities without altering the model's architecture or requiring external tools.",
+      "optuna_config": {
+        "enabled": false,
+        "n_trials": 20
+      }
+    },
+    "comparative_methods": [
+      {
+        "method_name": "Standard Chain-of-Thought (CoT)",
+        "description": "Standard Chain-of-Thought (CoT) is a prompting technique where the language model is instructed to generate a series of intermediate reasoning steps before arriving at a final answer. This typically involves appending 'Let\\'s think step by step.' to the problem statement. It aims to improve complex reasoning by breaking down problems into manageable steps.",
+        "optuna_config": {
+          "enabled": false,
+          "n_trials": 20
+        }
+      }
+    ]
   }
 }
