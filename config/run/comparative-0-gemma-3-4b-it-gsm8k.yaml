@@ -1,0 +1,31 @@
+# Run configuration for comparative method: Standard Chain-of-Thought (CoT)
+# Model: gemma-3-4b-it
+# Dataset: gsm8k
+
+run_id: comparative-0-gemma-3-4b-it-gsm8k
+
+method:
+  name: CoT
+  type: comparative
+  description: "Standard Chain-of-Thought prompting"
+  prompt_template: |
+    {problem}
+    
+    Let's think step by step.
+
+model:
+  name: gemma-3-4b-it
+  type: huggingface
+  max_new_tokens: 1024
+  temperature: 0.0
+  top_p: 1.0
+  do_sample: false
+
+dataset:
+  name: gsm8k
+  split: test
+  max_samples: null  # Use all samples in main mode
+
+inference:
+  batch_size: 1
+  num_workers: 0

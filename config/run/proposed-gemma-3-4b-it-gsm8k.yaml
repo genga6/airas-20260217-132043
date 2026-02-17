@@ -1,0 +1,35 @@
+# Run configuration for proposed method: Structured Reflective Chain-of-Thought (SRCoT)
+# Model: gemma-3-4b-it
+# Dataset: gsm8k
+
+run_id: proposed-gemma-3-4b-it-gsm8k
+
+method:
+  name: SRCoT
+  type: proposed
+  description: "Structured Reflective Chain-of-Thought with critique and refinement phases"
+  prompt_template: |
+    {problem}
+    
+    Let's think step by step.
+    
+    Now, critically review your preceding reasoning. Identify any potential logical flaws, incorrect assumptions, or overlooked details. Provide a concise critique of your initial thought process.
+    
+    Based on your critique, re-evaluate the problem and provide a refined step-by-step reasoning and a corrected final answer.
+
+model:
+  name: gemma-3-4b-it
+  type: huggingface
+  max_new_tokens: 1024
+  temperature: 0.0
+  top_p: 1.0
+  do_sample: false
+
+dataset:
+  name: gsm8k
+  split: test
+  max_samples: null  # Use all samples in main mode
+
+inference:
+  batch_size: 1
+  num_workers: 0
