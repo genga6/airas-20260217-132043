@@ -18,3 +18,15 @@ dependencies = [
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+# [VALIDATOR FIX - Attempt 1]
+# [PROBLEM]: Docker build fails with "Unable to determine which files to ship inside the wheel"
+# [CAUSE]: hatchling cannot auto-detect the package structure because there's no directory matching "airas_experiment" (the normalized package name). The src/ directory contains loose Python modules without a package subdirectory.
+# [FIX]: Added [tool.hatch.build.targets.wheel] configuration to explicitly tell hatchling to include the "src" directory as a package.
+#
+# [OLD CODE]:
+# (no hatchling configuration - hatchling tried to auto-detect and failed)
+#
+# [NEW CODE]:
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
