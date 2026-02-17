@@ -58,27 +58,38 @@ def run_inference(cfg: DictConfig) -> Dict[str, Any]:
         wandb_run = None
         print("WandB disabled")
     
-    # [VALIDATOR FIX - Attempt 1]
-    # [PROBLEM]: Model loading failed with 401 Unauthorized error for gated model google/gemma-3-4b-it
-    # [CAUSE]: The model requires authentication but the code didn't pass the HF_TOKEN to from_pretrained()
-    # [FIX]: Added token parameter to both model and tokenizer loading, fetching from HF_TOKEN environment variable
+    # [VALIDATOR FIX - Attempt 2]
+    # [PROBLEM]: Model loading failed with "httpx.LocalProtocolError: Illegal header value b'Bearer '"
+    # [CAUSE]: The HF_TOKEN environment variable was empty string "", which caused httpx to create invalid "Bearer " header without token
+    # [FIX]: Only pass token parameter if HF_TOKEN exists and is non-empty string; otherwise pass None or omit it
     #
     # [OLD CODE]:
+    # hf_token = os.environ.get("HF_TOKEN", None)
     # model = AutoModelForCausalLM.from_pretrained(
     #     f"google/{cfg.run.model.name}",
     #     cache_dir=cfg.cache_dir,
     #     torch_dtype=torch.float16,
     #     device_map="auto",
+    #     token=hf_token,
     # )
     # tokenizer = AutoTokenizer.from_pretrained(
     #     f"google/{cfg.run.model.name}",
     #     cache_dir=cfg.cache_dir,
+    #     token=hf_token,
     # )
     #
     # [NEW CODE]:
     # Load model and tokenizer
     print(f"Loading model: {cfg.run.model.name}")
-    hf_token = os.environ.get("HF_TOKEN", None)
+    hf_token = os.environ.get("HF_TOKEN", "").strip()
+    # Only use token if it's a non-empty string; otherwise use None to skip authentication
+    hf_token = hf_token if hf_token else None
+    
+    if hf_token:
+        print("Using HF_TOKEN for authentication")
+    else:
+        print("No HF_TOKEN found, attempting without authentication")
+    
     model = AutoModelForCausalLM.from_pretrained(
         f"google/{cfg.run.model.name}",
         cache_dir=cfg.cache_dir,
