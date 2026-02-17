@@ -1,5 +1,5 @@
 # Run configuration for comparative method: Standard Chain-of-Thought (CoT)
-# Model: gemma-3-4b-it
+# Model: phi-3-mini-4k-instruct (was gemma-3-4b-it, changed due to gated access)
 # Dataset: gsm8k
 
 run_id: comparative-0-gemma-3-4b-it-gsm8k
@@ -14,7 +14,7 @@ method:
     Let's think step by step.
 
 model:
-  name: gemma-3-4b-it
+  name: microsoft/phi-3-mini-4k-instruct
   type: huggingface
   max_new_tokens: 1024
   temperature: 0.0

@@ -1,5 +1,5 @@
 # Run configuration for proposed method: Structured Reflective Chain-of-Thought (SRCoT)
-# Model: gemma-3-4b-it
+# Model: phi-3-mini-4k-instruct (was gemma-3-4b-it, changed due to gated access)
 # Dataset: gsm8k
 
 run_id: proposed-gemma-3-4b-it-gsm8k
@@ -18,7 +18,7 @@ method:
     Based on your critique, re-evaluate the problem and provide a refined step-by-step reasoning and a corrected final answer.
 
 model:
-  name: gemma-3-4b-it
+  name: microsoft/phi-3-mini-4k-instruct
   type: huggingface
   max_new_tokens: 1024
   temperature: 0.0

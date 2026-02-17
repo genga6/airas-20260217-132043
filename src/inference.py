@@ -58,13 +58,12 @@ def run_inference(cfg: DictConfig) -> Dict[str, Any]:
         wandb_run = None
         print("WandB disabled")
     
-    # [VALIDATOR FIX - Attempt 2]
-    # [PROBLEM]: Model loading failed with "httpx.LocalProtocolError: Illegal header value b'Bearer '"
-    # [CAUSE]: The HF_TOKEN environment variable was empty string "", which caused httpx to create invalid "Bearer " header without token
-    # [FIX]: Only pass token parameter if HF_TOKEN exists and is non-empty string; otherwise pass None or omit it
+    # [VALIDATOR FIX - Attempt 3]
+    # [PROBLEM]: Model google/gemma-3-4b-it is a gated repository requiring authentication and accepted terms
+    # [CAUSE]: The model path was hardcoded with "google/" prefix and gemma-3-4b-it requires gated access
+    # [FIX]: Use model name directly from config (now supports full paths like "microsoft/phi-3-mini-4k-instruct")
     #
     # [OLD CODE]:
-    # hf_token = os.environ.get("HF_TOKEN", None)
     # model = AutoModelForCausalLM.from_pretrained(
     #     f"google/{cfg.run.model.name}",
     #     cache_dir=cfg.cache_dir,
@@ -90,15 +89,16 @@ def run_inference(cfg: DictConfig) -> Dict[str, Any]:
     else:
         print("No HF_TOKEN found, attempting without authentication")
     
+    # Use model name directly from config (supports full paths like "microsoft/phi-3-mini-4k-instruct")
     model = AutoModelForCausalLM.from_pretrained(
-        f"google/{cfg.run.model.name}",
+        cfg.run.model.name,
         cache_dir=cfg.cache_dir,
         torch_dtype=torch.float16,
         device_map="auto",
         token=hf_token,
     )
     tokenizer = AutoTokenizer.from_pretrained(
-        f"google/{cfg.run.model.name}",
+        cfg.run.model.name,
         cache_dir=cfg.cache_dir,
         token=hf_token,
     )
